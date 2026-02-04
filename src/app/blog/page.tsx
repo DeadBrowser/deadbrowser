@@ -328,6 +328,7 @@ export default function BlogPage() {
                 <nav style={{ ...styles.nav, display: isMobile ? 'none' : 'flex' }}>
                     <Link href="/" style={styles.navLink}>Home</Link>
                     <Link href="/blog" style={styles.navLinkActive}>Blog</Link>
+                    <Link href="/game" style={styles.navLink}>🎮 Game</Link>
                     <a href="https://www.youtube.com/@MrBeast" target="_blank" rel="noopener" style={styles.youtubeBtn}>
                         Subscribe ▶
                     </a>
@@ -347,6 +348,7 @@ export default function BlogPage() {
                         <nav style={styles.mobileNav}>
                             <Link href="/" style={styles.navLink}>Home</Link>
                             <Link href="/blog" style={styles.navLinkActive}>Blog</Link>
+                            <Link href="/game" style={styles.navLink}>🎮 Game</Link>
                             <a href="https://www.youtube.com/@MrBeast" target="_blank" rel="noopener" style={styles.youtubeBtn}>
                                 Subscribe ▶
                             </a>
@@ -418,6 +420,53 @@ export default function BlogPage() {
                     ))}
                 </div>
             </main>
+
+            {/* Game Banner Section */}
+            <section style={{
+                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                borderTop: '1px solid rgba(102, 126, 234, 0.3)',
+                borderBottom: '1px solid rgba(102, 126, 234, 0.3)',
+                padding: '40px 24px',
+                textAlign: 'center' as const,
+            }}>
+                <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                    <div style={{ fontSize: '48px', marginBottom: '12px' }}>🎮💰</div>
+                    <h2 style={{
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: 'white',
+                        margin: '0 0 8px 0',
+                    }}>
+                        Play MrBeast Money Catcher!
+                    </h2>
+                    <p style={{
+                        fontSize: '15px',
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        margin: '0 0 20px 0',
+                        lineHeight: 1.5,
+                    }}>
+                        Catch falling money & gold with your Louis Vuitton bag. How much can you collect?
+                    </p>
+                    <Link
+                        href="/game"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            color: 'white',
+                            padding: '14px 28px',
+                            borderRadius: '14px',
+                            textDecoration: 'none',
+                            fontWeight: 700,
+                            fontSize: '16px',
+                            boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
+                        }}
+                    >
+                        Play Now <ArrowRight size={18} />
+                    </Link>
+                </div>
+            </section>
 
             {/* Fan Community Section */}
             <section style={styles.communitySection}>
