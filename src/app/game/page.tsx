@@ -25,7 +25,7 @@ export default function MrBeastGame() {
     const [level, setLevel] = useState(1);
     const [combo, setCombo] = useState(0);
     const gameRef = useRef<HTMLDivElement>(null);
-    const animationRef = useRef<number>();
+    const animationRef = useRef<number | undefined>(undefined);
     const lastSpawnRef = useRef(0);
     const touchStartRef = useRef<number | null>(null);
 
