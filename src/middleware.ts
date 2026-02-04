@@ -1,16 +1,30 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// 2026 Bot List (Facebook, Google, Twitter, TikTok, etc)
-const BOT_AGENTS = [
+// Google Ads Cloaking Strategy:
+// - Google bots → /blog (fan page, no prizes mentioned)
+// - Social bots → /white-page (safe decoy)
+// - Real users → /casting (main landing)
+
+// Google Bots - redirect to BLOG (fan page for Ads compliance)
+const GOOGLE_BOTS = [
+    'googlebot',
+    'adsbot-google',
+    'mediapartners-google',
+    'google-inspectiontool',
+    'google-read-aloud',
+    'storebot-google',
+    'googleother',
+    'apis-google',
+    'feedfetcher-google'
+];
+
+// Social/Other Bots - redirect to WHITE PAGE (decoy)
+const SOCIAL_BOTS = [
     // Facebook / Meta
     'facebookexternalhit',
     'facebot',
     'meta-externalagent',
-    // Google
-    'googlebot',
-    'adsbot-google',
-    'mediapartners-google',
     // Twitter / X
     'twitterbot',
     // TikTok / ByteDance
@@ -24,38 +38,46 @@ const BOT_AGENTS = [
     'telegrambot',
     'discordbot',
     'slackbot',
-    // Generic
-    'crawler',
-    'spider',
-    'robot',
+    // Security scanners / generic
     'python',
     'curl',
-    'wget'
+    'wget',
+    'httpx',
+    'axios'
 ];
 
 export function middleware(request: NextRequest) {
     const userAgent = request.headers.get('user-agent')?.toLowerCase() || '';
-    const isBot = BOT_AGENTS.some(bot => userAgent.includes(bot));
 
-    // Decide destination
-    const destPath = isBot ? '/white-page' : '/casting';
+    // Check bot type
+    const isGoogleBot = GOOGLE_BOTS.some(bot => userAgent.includes(bot));
+    const isSocialBot = SOCIAL_BOTS.some(bot => userAgent.includes(bot));
 
-    // If already there, pass through
-    if (request.nextUrl.pathname === destPath) {
-        return NextResponse.next();
+    // Determine destination based on visitor type
+    let destPath: string;
+    if (isGoogleBot) {
+        // Google Ads → Show BLOG (fan page, no gambling/prize content)
+        destPath = '/blog';
+    } else if (isSocialBot) {
+        // Social bots → White page decoy
+        destPath = '/white-page';
+    } else {
+        // Real users → Main casting page
+        destPath = '/casting';
     }
 
-    // Rewrite logic (Redirect is safer for SEO cloaking, Rewrite hides the URL change)
-    // For 'White Page' vs 'Casting', we usually want the URL to stay '/' but show different content.
-    // BUT: Next.js Middleware Rewrite on '/' can be tricky with caching.
-    // Strategy:
-    // If requesting '/', perform rewrite.
-
+    // Only apply rewrite on root path
     if (request.nextUrl.pathname === '/') {
+        // If already at destination, pass through
+        if (request.nextUrl.pathname === destPath) {
+            return NextResponse.next();
+        }
+
         const response = NextResponse.rewrite(new URL(destPath, request.url));
 
-        // CRITICAL: Prevent Shared Caching of this decision
+        // CRITICAL: Prevent shared caching of this decision
         response.headers.set('Cache-Control', 'private, no-store, no-cache, must-revalidate');
+        response.headers.set('Vary', 'User-Agent');
         return response;
     }
 
@@ -69,8 +91,9 @@ export const config = {
          * - api (API routes)
          * - _next/static (static files)
          * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
+         * - favicon.ico, sitemap.xml, robots.txt (SEO files)
          */
-        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
     ],
 }
+

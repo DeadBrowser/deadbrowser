@@ -1,0 +1,12 @@
+# MrBeast News - Robots.txt
+# Allow all search engines to index the site
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://mrbeastnews.com/sitemap.xml
+
+# Block admin paths (if any)
+Disallow: /api/
+Disallow: /_next/
