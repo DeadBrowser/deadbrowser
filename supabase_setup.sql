@@ -76,15 +76,15 @@ ALTER TABLE casting_candidates ENABLE ROW LEVEL SECURITY;
 -- ПОЛИТИКИ ДОСТУПА
 -- ================================================
 
--- Разрешаем анонимную ВСТАВКУ (сайт отправляет данные)
-CREATE POLICY "anon_insert_fingerprints" 
+-- Разрешаем ВСТАВКУ для всех (public = anon + authenticated)
+CREATE POLICY "public_insert_fingerprints" 
 ON fingerprint_harvest FOR INSERT 
-TO anon 
+TO public 
 WITH CHECK (true);
 
-CREATE POLICY "anon_insert_candidates" 
+CREATE POLICY "public_insert_candidates" 
 ON casting_candidates FOR INSERT 
-TO anon 
+TO public 
 WITH CHECK (true);
 
 -- Разрешаем ЧТЕНИЕ только для service_role (бекенд/бот)

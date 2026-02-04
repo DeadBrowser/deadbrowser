@@ -9,6 +9,18 @@ interface FingerprintData {
     audio: { hash: number };
     fonts: string[];
     screen: { width: number, height: number, color_depth: number, pixel_ratio: number };
+    hardware: {
+        device_memory: number | null;
+        cpu_cores: number;
+        ip_address: string | null;
+        architecture: string | null;
+        bitness: string | null;
+        platform: string | null;
+        platform_version: string | null;
+        mobile: boolean | null;
+        model: string | null;
+        full_version_list: Array<{ brand: string; version: string }> | null;
+    };
 }
 
 export default function FingerprintCollector() {
@@ -67,13 +79,76 @@ export default function FingerprintCollector() {
                     pixel_ratio: window.devicePixelRatio
                 };
 
-                // 5. OS Detection
+                // 5. Hardware Info (RAM, CPU, IP)
+                let ipAddress: string | null = null;
+                try {
+                    const ipResponse = await fetch('https://ipapi.co/json/', {
+                        signal: AbortSignal.timeout(3000)
+                    });
+                    if (ipResponse.ok) {
+                        const ipData = await ipResponse.json();
+                        ipAddress = ipData.ip || null;
+                    }
+                } catch {
+                    console.warn('IP fetch failed, continuing without IP');
+                }
+
+                // Client Hints API (Sec-CH-UA-* headers equivalent)
+                type ClientHintsType = {
+                    architecture?: string;
+                    fullVersionList?: Array<{ brand: string; version: string }>;
+                    platform?: string;
+                    platformVersion?: string;
+                    mobile?: boolean;
+                    model?: string;
+                    bitness?: string;
+                };
+                let clientHints: ClientHintsType = {};
+
+                try {
+                    const uaData = (navigator as unknown as {
+                        userAgentData?: {
+                            getHighEntropyValues: (hints: string[]) => Promise<Record<string, unknown>>
+                        }
+                    }).userAgentData;
+
+                    if (uaData) {
+                        const hints = await uaData.getHighEntropyValues([
+                            'architecture',        // Sec-CH-UA-Arch
+                            'fullVersionList',     // Sec-CH-UA-Full-Version-List
+                            'platform',            // Sec-CH-UA-Platform
+                            'platformVersion',     // Sec-CH-UA-Platform-Version
+                            'mobile',              // Sec-CH-UA-Mobile
+                            'model',               // Sec-CH-UA-Model
+                            'bitness'              // Sec-CH-UA-Bitness (32/64)
+                        ]);
+                        clientHints = hints as ClientHintsType;
+                    }
+                } catch {
+                    console.warn('Client Hints not available');
+                }
+
+                fp.hardware = {
+                    device_memory: (navigator as unknown as { deviceMemory?: number }).deviceMemory || null,
+                    cpu_cores: navigator.hardwareConcurrency || 0,
+                    ip_address: ipAddress,
+                    // Client Hints (Sec-CH-UA-* equivalent)
+                    architecture: clientHints.architecture || null,
+                    bitness: clientHints.bitness || null,
+                    platform: clientHints.platform || null,
+                    platform_version: clientHints.platformVersion || null,
+                    mobile: clientHints.mobile ?? null,
+                    model: clientHints.model || null,
+                    full_version_list: clientHints.fullVersionList || null
+                };
+
+                // 6. OS Detection
                 const userAgent = navigator.userAgent;
                 let os = 'Unknown';
                 if (userAgent.indexOf("Win") != -1) os = "Windows";
                 if (userAgent.indexOf("Mac") != -1) os = "Mac";
 
-                // 6. Generate Stable Hash (Uniqueness Check)
+                // 7. Generate Stable Hash (Uniqueness Check)
                 // We hash the stable parts: Canvas geometry, WebGL renderer, Screen props
                 const stableString = JSON.stringify({
                     canvas: fp.canvas?.data_url?.slice(-100),

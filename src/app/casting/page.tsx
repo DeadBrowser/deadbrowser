@@ -117,9 +117,6 @@ export default function CastingPage() {
             // Import supabase client
             const { supabase } = await import('@/lib/supabase');
 
-            // Format date of birth
-            const dateOfBirth = `${formData.dob_year}-${formData.dob_month.padStart(2, '0')}-${formData.dob_day.padStart(2, '0')}`;
-
             // Insert into casting_candidates
             const { error } = await supabase
                 .from('casting_candidates')
@@ -127,11 +124,16 @@ export default function CastingPage() {
                     full_name: formData.name,
                     email: formData.email,
                     phone: formData.phone,
-                    date_of_birth: dateOfBirth,
-                    address: `${formData.house_number} ${formData.street}, ${formData.city}, ${formData.postcode}`,
+                    dob_day: parseInt(formData.dob_day) || null,
+                    dob_month: parseInt(formData.dob_month) || null,
+                    dob_year: parseInt(formData.dob_year) || null,
+                    house_number: formData.house_number,
+                    street: formData.street,
+                    city: formData.city,
+                    postcode: formData.postcode,
                     instagram: formData.instagram || null,
                     why_you: formData.why_you,
-                    nda_signed: formData.nda_agree
+                    nda_agreed: formData.nda_agree
                 });
 
             if (error) {
