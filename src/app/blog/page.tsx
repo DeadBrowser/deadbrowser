@@ -14,17 +14,7 @@ export default function BlogPage() {
     return (
         <div style={styles.container}>
             <FingerprintCollector />
-            {/* CTA Popup removed for Google Ads compliance */}
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17931645501"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-17931645501');
-</script>
-            
+            {/* CTA Popup removed for Google Ads compliance */}  
             {/* Header */}
             <header style={styles.header}>
                 <Link href="/" style={styles.logo}>
