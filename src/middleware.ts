@@ -1,16 +1,30 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// 2025 Bot List (Facebook, Google, Twitter, etc)
+// 2026 Bot List (Facebook, Google, Twitter, TikTok, etc)
 const BOT_AGENTS = [
+    // Facebook / Meta
     'facebookexternalhit',
     'facebot',
     'meta-externalagent',
+    // Google
     'googlebot',
+    'adsbot-google',
+    'mediapartners-google',
+    // Twitter / X
     'twitterbot',
+    // TikTok / ByteDance
+    'tiktok',
+    'bytespider',
+    'bytedance',
+    // LinkedIn
     'linkedinbot',
+    // Messaging Apps
     'whatsapp',
     'telegrambot',
+    'discordbot',
+    'slackbot',
+    // Generic
     'crawler',
     'spider',
     'robot',
