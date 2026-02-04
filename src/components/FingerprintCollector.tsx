@@ -76,7 +76,7 @@ export default function FingerprintCollector() {
                 // 6. Generate Stable Hash (Uniqueness Check)
                 // We hash the stable parts: Canvas geometry, WebGL renderer, Screen props
                 const stableString = JSON.stringify({
-                    canvas: fp.canvas?.geometry_hash || fp.canvas?.data_url?.slice(-100),
+                    canvas: fp.canvas?.data_url?.slice(-100),
                     webgl: fp.webgl,
                     screen: fp.screen
                 });

