@@ -1,42 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* MrBeast Palette */
+  --beast-blue: #228fda;
+  --beast-pink: #f63089;
+  --beast-yellow: #ffd700; 
+  --beast-black: #0a0a0a;
+
+  --font-beast: sans-serif; /* Placeholder for Obelix Pro if imported */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
 body {
-  max-width: 100vw;
+  color: white;
+  background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+  font-family: var(--font-beast);
+  margin: 0;
+  padding: 0;
   overflow-x: hidden;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Utilities */
+.beast-btn {
+  background: var(--beast-pink);
+  color: white;
+  border: 4px solid white;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 1rem 3rem;
+  font-size: 2rem;
+  transform: skew(-5deg);
+  transition: transform 0.1s, box-shadow 0.1s;
+  cursor: pointer;
+  box-shadow: 0 10px 0 #000;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+.beast-btn:active {
+  transform: skew(-5deg) translateY(5px);
+  box-shadow: 0 5px 0 #000;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.beast-title {
+  color: white;
+  text-shadow: 4px 4px 0px #000;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-style: italic;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.hidden {
+  display: none !important;
 }
