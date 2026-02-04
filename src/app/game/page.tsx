@@ -88,15 +88,15 @@ export default function MrBeastGame() {
         // 70% money, 30% gold
         const isGold = Math.random() < 0.3;
 
-        // Base speed is very slow - 0.3 to 0.6
-        const baseSpeed = 0.3 + (level * 0.05);
+        // Base speed is very slow - 0.15 to 0.35
+        const baseSpeed = 0.15 + (level * 0.03);
 
         const newItem: FallingItem = {
             id: Date.now() + Math.random(),
             x: 10 + Math.random() * 80,
             y: -8,
             value: isGold ? 100 : 25,
-            speed: baseSpeed + Math.random() * 0.3,
+            speed: baseSpeed + Math.random() * 0.15,
             type: isGold ? 'gold' : 'money',
             rotation: Math.random() * 360,
         };
@@ -256,7 +256,6 @@ export default function MrBeastGame() {
                             transform: `translateX(-50%) rotate(${item.rotation}deg)`,
                             width: item.type === 'gold' ? '50px' : '45px',
                             height: item.type === 'gold' ? '50px' : '45px',
-                            transition: 'top 0.05s linear',
                         }}
                     >
                         <Image
@@ -468,7 +467,6 @@ const styles: { [key: string]: React.CSSProperties } = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        transition: 'left 0.08s ease-out',
     },
     playerSprite: {
         width: '100px',
