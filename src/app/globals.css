@@ -355,8 +355,10 @@ body {
 .modal-glass {
   width: 100%;
   max-width: 480px;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   background: rgba(30, 30, 40, 0.9);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
