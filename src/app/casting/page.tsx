@@ -161,6 +161,13 @@ export default function CastingPage() {
         }
     };
 
+    // Auto-scroll when focusing on form fields
+    const scrollToField = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setTimeout(() => {
+            e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    };
+
     const closeModal = () => setActiveModal(null);
 
     return (
@@ -444,6 +451,7 @@ export default function CastingPage() {
                                                                 required
                                                                 value={formData.name}
                                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                                onFocus={scrollToField}
                                                                 placeholder="Enter your full name"
                                                             />
                                                         </div>
@@ -455,6 +463,7 @@ export default function CastingPage() {
                                                                 required
                                                                 value={formData.email}
                                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                                onFocus={scrollToField}
                                                                 placeholder="you@example.com"
                                                             />
                                                         </div>
@@ -466,6 +475,7 @@ export default function CastingPage() {
                                                                 required
                                                                 value={formData.phone}
                                                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                                onFocus={scrollToField}
                                                                 placeholder="+44 7XXX XXX XXX"
                                                             />
                                                         </div>
@@ -479,6 +489,7 @@ export default function CastingPage() {
                                                                     required
                                                                     value={formData.dob_day}
                                                                     onChange={(e) => setFormData({ ...formData, dob_day: e.target.value })}
+                                                                    onFocus={scrollToField}
                                                                     placeholder="DD"
                                                                     maxLength={2}
                                                                     className="dob-input"
@@ -488,6 +499,7 @@ export default function CastingPage() {
                                                                     required
                                                                     value={formData.dob_month}
                                                                     onChange={(e) => setFormData({ ...formData, dob_month: e.target.value })}
+                                                                    onFocus={scrollToField}
                                                                     placeholder="MM"
                                                                     maxLength={2}
                                                                     className="dob-input"
@@ -497,6 +509,7 @@ export default function CastingPage() {
                                                                     required
                                                                     value={formData.dob_year}
                                                                     onChange={(e) => setFormData({ ...formData, dob_year: e.target.value })}
+                                                                    onFocus={scrollToField}
                                                                     placeholder="YYYY"
                                                                     maxLength={4}
                                                                     className="dob-input year"
@@ -513,6 +526,7 @@ export default function CastingPage() {
                                                                     required
                                                                     value={formData.house_number}
                                                                     onChange={(e) => setFormData({ ...formData, house_number: e.target.value })}
+                                                                    onFocus={scrollToField}
                                                                     placeholder="12"
                                                                 />
                                                             </div>
@@ -523,6 +537,7 @@ export default function CastingPage() {
                                                                     required
                                                                     value={formData.street}
                                                                     onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                                                                    onFocus={scrollToField}
                                                                     placeholder="High Street"
                                                                 />
                                                             </div>
@@ -536,6 +551,7 @@ export default function CastingPage() {
                                                                     required
                                                                     value={formData.city}
                                                                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                                                    onFocus={scrollToField}
                                                                     placeholder="London"
                                                                 />
                                                             </div>
@@ -546,6 +562,7 @@ export default function CastingPage() {
                                                                     required
                                                                     value={formData.postcode}
                                                                     onChange={(e) => setFormData({ ...formData, postcode: e.target.value })}
+                                                                    onFocus={scrollToField}
                                                                     placeholder="SW1A 1AA"
                                                                 />
                                                             </div>
@@ -557,6 +574,7 @@ export default function CastingPage() {
                                                                 type="text"
                                                                 value={formData.instagram}
                                                                 onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                                                                onFocus={scrollToField}
                                                                 placeholder="@yourusername"
                                                             />
                                                         </div>
@@ -568,6 +586,7 @@ export default function CastingPage() {
                                                                 rows={3}
                                                                 value={formData.why_you}
                                                                 onChange={(e) => setFormData({ ...formData, why_you: e.target.value })}
+                                                                onFocus={scrollToField}
                                                                 placeholder="Tell us what makes you stand out..."
                                                             />
                                                         </div>
