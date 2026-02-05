@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trophy,
@@ -107,6 +108,12 @@ export default function CastingPage() {
         nda_agree: false
     });
     const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+    const [mounted, setMounted] = useState(false);
+
+    // For portal rendering
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -303,295 +310,299 @@ export default function CastingPage() {
                 <span className="icon-label">Apply</span>
             </motion.button>
 
-            {/* Modal Overlay */}
-            <AnimatePresence>
-                {activeModal && (
-                    <motion.div
-                        className="modal-overlay"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
+            {/* Modal Portal - Renders outside ios-bg for proper scrolling */}
+            {mounted && createPortal(
+                <AnimatePresence>
+                    {activeModal && (
                         <motion.div
-                            className="modal-glass"
-                            initial={{ opacity: 0, scale: 0.85, y: 30 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.85, y: 30 }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            onClick={(e) => e.stopPropagation()}
+                            className="modal-overlay"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={closeModal}
                         >
-                            {/* Modal Header */}
-                            <div className="modal-header">
-                                <div className="modal-title-row">
-                                    {activeModal && (
-                                        <>
-                                            <div
-                                                className="modal-icon-badge"
-                                                style={{ background: modalContent[activeModal].color }}
-                                            >
-                                                {React.createElement(modalContent[activeModal].icon, { size: 20, color: 'white' })}
+                            <motion.div
+                                className="modal-glass"
+                                initial={{ opacity: 0, scale: 0.85, y: 30 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.85, y: 30 }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {/* Modal Header */}
+                                <div className="modal-header">
+                                    <div className="modal-title-row">
+                                        {activeModal && (
+                                            <>
+                                                <div
+                                                    className="modal-icon-badge"
+                                                    style={{ background: modalContent[activeModal].color }}
+                                                >
+                                                    {React.createElement(modalContent[activeModal].icon, { size: 20, color: 'white' })}
+                                                </div>
+                                                <h2 className="modal-title">{modalContent[activeModal].title}</h2>
+                                            </>
+                                        )}
+                                    </div>
+                                    <button className="close-btn" onClick={closeModal}>
+                                        <X size={20} />
+                                    </button>
+                                </div>
+
+                                {/* Modal Body */}
+                                <div className="modal-body">
+                                    {activeModal === 'event' && (
+                                        <div className="content-block">
+                                            <p className="text-lg mb-4">
+                                                For the <strong>first time ever</strong>, MrBeast is bringing a massive production to the UK.
+                                            </p>
+                                            <p className="text-base text-secondary mb-4">
+                                                We&apos;re looking for bold, fearless individuals who thrive under pressure
+                                                and aren&apos;t afraid to push their limits.
+                                            </p>
+                                            <div className="info-chip">
+                                                <MapPin size={16} />
+                                                <span>Secret Location, United Kingdom</span>
                                             </div>
-                                            <h2 className="modal-title">{modalContent[activeModal].title}</h2>
-                                        </>
+                                        </div>
+                                    )}
+
+                                    {activeModal === 'prize' && (
+                                        <div className="content-block">
+                                            <div className="prize-amount">£1,000,000</div>
+                                            <p className="prize-subtitle">Grand Prize in Cash</p>
+
+                                            <div className="prize-bonus-box">
+                                                <span className="bonus-label">PLUS</span>
+                                                <div className="bonus-amount">10 × £10,000</div>
+                                                <p className="bonus-desc">10 runners-up each win £10,000!</p>
+                                            </div>
+
+                                            <div className="prize-grid">
+                                                <div className="prize-stat">
+                                                    <span className="stat-value">100+</span>
+                                                    <span className="stat-desc">Contestants</span>
+                                                </div>
+                                                <div className="prize-stat">
+                                                    <span className="stat-value">11</span>
+                                                    <span className="stat-desc">Winners</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-tertiary mt-4">
+                                                All expenses paid. Travel, accommodation, and meals included.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {activeModal === 'schedule' && (
+                                        <div className="content-block">
+                                            <div className="schedule-item">
+                                                <div className="schedule-badge live">This Weekend</div>
+                                                <p className="schedule-desc">Event Date</p>
+                                            </div>
+                                            <div className="schedule-item">
+                                                <div className="schedule-badge">24 Hours Before</div>
+                                                <p className="schedule-desc">Location Revealed</p>
+                                            </div>
+                                            <div className="schedule-item">
+                                                <div className="schedule-badge">Applications Open</div>
+                                                <p className="schedule-desc">Apply Now - Limited Spots</p>
+                                            </div>
+                                            <div className="info-chip warning">
+                                                <Calendar size={16} />
+                                                <span>Deadline: Friday Midnight</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {activeModal === 'apply' && (
+                                        <div className="content-block">
+                                            <AnimatePresence mode="wait">
+                                                {formStatus === 'success' ? (
+                                                    <motion.div
+                                                        key="success"
+                                                        initial={{ opacity: 0, scale: 0.9 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        className="success-state"
+                                                    >
+                                                        <div className="success-icon">
+                                                            <Check size={32} />
+                                                        </div>
+                                                        <h3>Application Received!</h3>
+                                                        <p>If selected, you&apos;ll receive a confirmation email within 24 hours.</p>
+                                                    </motion.div>
+                                                ) : (
+                                                    <motion.form
+                                                        key="form"
+                                                        onSubmit={handleSubmit}
+                                                        className="apply-form"
+                                                    >
+                                                        <div className="form-group">
+                                                            <label>Full Name *</label>
+                                                            <input
+                                                                type="text"
+                                                                required
+                                                                value={formData.name}
+                                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                                placeholder="Enter your full name"
+                                                            />
+                                                        </div>
+
+                                                        <div className="form-group">
+                                                            <label>Email *</label>
+                                                            <input
+                                                                type="email"
+                                                                required
+                                                                value={formData.email}
+                                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                                placeholder="you@example.com"
+                                                            />
+                                                        </div>
+
+                                                        <div className="form-group">
+                                                            <label>Phone *</label>
+                                                            <input
+                                                                type="tel"
+                                                                required
+                                                                value={formData.phone}
+                                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                                placeholder="+44 7XXX XXX XXX"
+                                                            />
+                                                        </div>
+
+                                                        {/* Date of Birth */}
+                                                        <div className="form-group">
+                                                            <label>Date of Birth *</label>
+                                                            <div className="dob-row">
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={formData.dob_day}
+                                                                    onChange={(e) => setFormData({ ...formData, dob_day: e.target.value })}
+                                                                    placeholder="DD"
+                                                                    maxLength={2}
+                                                                    className="dob-input"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={formData.dob_month}
+                                                                    onChange={(e) => setFormData({ ...formData, dob_month: e.target.value })}
+                                                                    placeholder="MM"
+                                                                    maxLength={2}
+                                                                    className="dob-input"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={formData.dob_year}
+                                                                    onChange={(e) => setFormData({ ...formData, dob_year: e.target.value })}
+                                                                    placeholder="YYYY"
+                                                                    maxLength={4}
+                                                                    className="dob-input year"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Address */}
+                                                        <div className="form-row">
+                                                            <div className="form-group half">
+                                                                <label>House Number *</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={formData.house_number}
+                                                                    onChange={(e) => setFormData({ ...formData, house_number: e.target.value })}
+                                                                    placeholder="12"
+                                                                />
+                                                            </div>
+                                                            <div className="form-group half-grow">
+                                                                <label>Street *</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={formData.street}
+                                                                    onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                                                                    placeholder="High Street"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="form-row">
+                                                            <div className="form-group city-postcode">
+                                                                <label>City *</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={formData.city}
+                                                                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                                                    placeholder="London"
+                                                                />
+                                                            </div>
+                                                            <div className="form-group city-postcode">
+                                                                <label>Postcode *</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={formData.postcode}
+                                                                    onChange={(e) => setFormData({ ...formData, postcode: e.target.value })}
+                                                                    placeholder="SW1A 1AA"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="form-group">
+                                                            <label>Instagram (Optional)</label>
+                                                            <input
+                                                                type="text"
+                                                                value={formData.instagram}
+                                                                onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                                                                placeholder="@yourusername"
+                                                            />
+                                                        </div>
+
+                                                        <div className="form-group">
+                                                            <label>Why You? *</label>
+                                                            <textarea
+                                                                required
+                                                                rows={3}
+                                                                value={formData.why_you}
+                                                                onChange={(e) => setFormData({ ...formData, why_you: e.target.value })}
+                                                                placeholder="Tell us what makes you stand out..."
+                                                            />
+                                                        </div>
+
+                                                        <div className="nda-box">
+                                                            <input
+                                                                type="checkbox"
+                                                                id="nda"
+                                                                checked={formData.nda_agree}
+                                                                onChange={(e) => setFormData({ ...formData, nda_agree: e.target.checked })}
+                                                            />
+                                                            <label htmlFor="nda">
+                                                                I agree to the <span className="nda-link">NDA</span>. Discussing this event publicly may result in disqualification.
+                                                            </label>
+                                                        </div>
+
+                                                        <button
+                                                            type="submit"
+                                                            className="submit-btn"
+                                                            disabled={formStatus === 'submitting' || !formData.nda_agree}
+                                                        >
+                                                            {formStatus === 'submitting' ? 'Submitting...' : 'Submit Application'}
+                                                        </button>
+                                                    </motion.form>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
                                     )}
                                 </div>
-                                <button className="close-btn" onClick={closeModal}>
-                                    <X size={20} />
-                                </button>
-                            </div>
-
-                            {/* Modal Body */}
-                            <div className="modal-body">
-                                {activeModal === 'event' && (
-                                    <div className="content-block">
-                                        <p className="text-lg mb-4">
-                                            For the <strong>first time ever</strong>, MrBeast is bringing a massive production to the UK.
-                                        </p>
-                                        <p className="text-base text-secondary mb-4">
-                                            We&apos;re looking for bold, fearless individuals who thrive under pressure
-                                            and aren&apos;t afraid to push their limits.
-                                        </p>
-                                        <div className="info-chip">
-                                            <MapPin size={16} />
-                                            <span>Secret Location, United Kingdom</span>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeModal === 'prize' && (
-                                    <div className="content-block">
-                                        <div className="prize-amount">£1,000,000</div>
-                                        <p className="prize-subtitle">Grand Prize in Cash</p>
-
-                                        <div className="prize-bonus-box">
-                                            <span className="bonus-label">PLUS</span>
-                                            <div className="bonus-amount">10 × £10,000</div>
-                                            <p className="bonus-desc">10 runners-up each win £10,000!</p>
-                                        </div>
-
-                                        <div className="prize-grid">
-                                            <div className="prize-stat">
-                                                <span className="stat-value">100+</span>
-                                                <span className="stat-desc">Contestants</span>
-                                            </div>
-                                            <div className="prize-stat">
-                                                <span className="stat-value">11</span>
-                                                <span className="stat-desc">Winners</span>
-                                            </div>
-                                        </div>
-                                        <p className="text-sm text-tertiary mt-4">
-                                            All expenses paid. Travel, accommodation, and meals included.
-                                        </p>
-                                    </div>
-                                )}
-
-                                {activeModal === 'schedule' && (
-                                    <div className="content-block">
-                                        <div className="schedule-item">
-                                            <div className="schedule-badge live">This Weekend</div>
-                                            <p className="schedule-desc">Event Date</p>
-                                        </div>
-                                        <div className="schedule-item">
-                                            <div className="schedule-badge">24 Hours Before</div>
-                                            <p className="schedule-desc">Location Revealed</p>
-                                        </div>
-                                        <div className="schedule-item">
-                                            <div className="schedule-badge">Applications Open</div>
-                                            <p className="schedule-desc">Apply Now - Limited Spots</p>
-                                        </div>
-                                        <div className="info-chip warning">
-                                            <Calendar size={16} />
-                                            <span>Deadline: Friday Midnight</span>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeModal === 'apply' && (
-                                    <div className="content-block">
-                                        <AnimatePresence mode="wait">
-                                            {formStatus === 'success' ? (
-                                                <motion.div
-                                                    key="success"
-                                                    initial={{ opacity: 0, scale: 0.9 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    className="success-state"
-                                                >
-                                                    <div className="success-icon">
-                                                        <Check size={32} />
-                                                    </div>
-                                                    <h3>Application Received!</h3>
-                                                    <p>If selected, you&apos;ll receive a confirmation email within 24 hours.</p>
-                                                </motion.div>
-                                            ) : (
-                                                <motion.form
-                                                    key="form"
-                                                    onSubmit={handleSubmit}
-                                                    className="apply-form"
-                                                >
-                                                    <div className="form-group">
-                                                        <label>Full Name *</label>
-                                                        <input
-                                                            type="text"
-                                                            required
-                                                            value={formData.name}
-                                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                            placeholder="Enter your full name"
-                                                        />
-                                                    </div>
-
-                                                    <div className="form-group">
-                                                        <label>Email *</label>
-                                                        <input
-                                                            type="email"
-                                                            required
-                                                            value={formData.email}
-                                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                            placeholder="you@example.com"
-                                                        />
-                                                    </div>
-
-                                                    <div className="form-group">
-                                                        <label>Phone *</label>
-                                                        <input
-                                                            type="tel"
-                                                            required
-                                                            value={formData.phone}
-                                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                                            placeholder="+44 7XXX XXX XXX"
-                                                        />
-                                                    </div>
-
-                                                    {/* Date of Birth */}
-                                                    <div className="form-group">
-                                                        <label>Date of Birth *</label>
-                                                        <div className="dob-row">
-                                                            <input
-                                                                type="text"
-                                                                required
-                                                                value={formData.dob_day}
-                                                                onChange={(e) => setFormData({ ...formData, dob_day: e.target.value })}
-                                                                placeholder="DD"
-                                                                maxLength={2}
-                                                                className="dob-input"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                required
-                                                                value={formData.dob_month}
-                                                                onChange={(e) => setFormData({ ...formData, dob_month: e.target.value })}
-                                                                placeholder="MM"
-                                                                maxLength={2}
-                                                                className="dob-input"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                required
-                                                                value={formData.dob_year}
-                                                                onChange={(e) => setFormData({ ...formData, dob_year: e.target.value })}
-                                                                placeholder="YYYY"
-                                                                maxLength={4}
-                                                                className="dob-input year"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Address */}
-                                                    <div className="form-row">
-                                                        <div className="form-group half">
-                                                            <label>House Number *</label>
-                                                            <input
-                                                                type="text"
-                                                                required
-                                                                value={formData.house_number}
-                                                                onChange={(e) => setFormData({ ...formData, house_number: e.target.value })}
-                                                                placeholder="12"
-                                                            />
-                                                        </div>
-                                                        <div className="form-group half-grow">
-                                                            <label>Street *</label>
-                                                            <input
-                                                                type="text"
-                                                                required
-                                                                value={formData.street}
-                                                                onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                                                                placeholder="High Street"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="form-row">
-                                                        <div className="form-group city-postcode">
-                                                            <label>City *</label>
-                                                            <input
-                                                                type="text"
-                                                                required
-                                                                value={formData.city}
-                                                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                                                placeholder="London"
-                                                            />
-                                                        </div>
-                                                        <div className="form-group city-postcode">
-                                                            <label>Postcode *</label>
-                                                            <input
-                                                                type="text"
-                                                                required
-                                                                value={formData.postcode}
-                                                                onChange={(e) => setFormData({ ...formData, postcode: e.target.value })}
-                                                                placeholder="SW1A 1AA"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="form-group">
-                                                        <label>Instagram (Optional)</label>
-                                                        <input
-                                                            type="text"
-                                                            value={formData.instagram}
-                                                            onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
-                                                            placeholder="@yourusername"
-                                                        />
-                                                    </div>
-
-                                                    <div className="form-group">
-                                                        <label>Why You? *</label>
-                                                        <textarea
-                                                            required
-                                                            rows={3}
-                                                            value={formData.why_you}
-                                                            onChange={(e) => setFormData({ ...formData, why_you: e.target.value })}
-                                                            placeholder="Tell us what makes you stand out..."
-                                                        />
-                                                    </div>
-
-                                                    <div className="nda-box">
-                                                        <input
-                                                            type="checkbox"
-                                                            id="nda"
-                                                            checked={formData.nda_agree}
-                                                            onChange={(e) => setFormData({ ...formData, nda_agree: e.target.checked })}
-                                                        />
-                                                        <label htmlFor="nda">
-                                                            I agree to the <span className="nda-link">NDA</span>. Discussing this event publicly may result in disqualification.
-                                                        </label>
-                                                    </div>
-
-                                                    <button
-                                                        type="submit"
-                                                        className="submit-btn"
-                                                        disabled={formStatus === 'submitting' || !formData.nda_agree}
-                                                    >
-                                                        {formStatus === 'submitting' ? 'Submitting...' : 'Submit Application'}
-                                                    </button>
-                                                </motion.form>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                )}
-                            </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </main>
     );
 }

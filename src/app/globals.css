@@ -32,6 +32,7 @@ body {
 .ios-bg {
   position: fixed;
   inset: 0;
+  overflow: auto;
   background: linear-gradient(135deg,
       #0a0a14 0%,
       #0f1a2e 50%,
@@ -345,21 +346,25 @@ body {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 1000;
+  /* CRITICAL: Use overflow auto and padding for scroll */
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 24px;
+  /* Use grid for centering that allows scrolling */
+  display: grid;
+  place-items: center;
+  min-height: 100%;
 }
 
 .modal-glass {
   width: 100%;
   max-width: 480px;
-  max-height: 85vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  background: rgba(30, 30, 40, 0.9);
+  /* Remove fixed max-height - let content determine height */
+  max-height: none;
+  /* Margin for spacing when scrolling */
+  margin: auto;
+  background: rgba(30, 30, 40, 0.95);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 24px;
