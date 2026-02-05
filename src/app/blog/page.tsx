@@ -326,9 +326,6 @@ export default function BlogPage() {
 
                 {/* Desktop Nav */}
                 <nav style={{ ...styles.nav, display: isMobile ? 'none' : 'flex' }}>
-                    <Link href="/" style={styles.navLink}>Home</Link>
-                    <Link href="/blog" style={styles.navLinkActive}>Blog</Link>
-                    <Link href="/game" style={styles.navLink}>🎮 Game</Link>
                     <a href="https://www.youtube.com/@MrBeast" target="_blank" rel="noopener" style={styles.youtubeBtn}>
                         Subscribe ▶
                     </a>
@@ -346,9 +343,6 @@ export default function BlogPage() {
                 {mobileMenuOpen && (
                     <div style={styles.mobileMenu}>
                         <nav style={styles.mobileNav}>
-                            <Link href="/" style={styles.navLink}>Home</Link>
-                            <Link href="/blog" style={styles.navLinkActive}>Blog</Link>
-                            <Link href="/game" style={styles.navLink}>🎮 Game</Link>
                             <a href="https://www.youtube.com/@MrBeast" target="_blank" rel="noopener" style={styles.youtubeBtn}>
                                 Subscribe ▶
                             </a>

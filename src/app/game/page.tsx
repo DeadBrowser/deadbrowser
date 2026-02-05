@@ -380,8 +380,8 @@ export default function MrBeastGame() {
 
 const styles: { [key: string]: React.CSSProperties } = {
     container: {
-        minHeight: '100vh',
-        height: '100vh',
+        minHeight: '100dvh',
+        height: '100dvh',
         background: 'linear-gradient(180deg, #1a0a2e 0%, #16213e 50%, #0f0f1a 100%)',
         color: 'white',
         fontFamily: "'Inter', sans-serif",
@@ -389,15 +389,19 @@ const styles: { [key: string]: React.CSSProperties } = {
         flexDirection: 'column',
         overflow: 'hidden',
         touchAction: 'none',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
     },
     header: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '12px 16px',
-        background: 'rgba(0, 0, 0, 0.6)',
+        padding: '16px 16px',
+        paddingTop: 'max(16px, env(safe-area-inset-top))',
+        background: 'rgba(0, 0, 0, 0.7)',
         backdropFilter: 'blur(10px)',
         zIndex: 100,
+        minHeight: '56px',
     },
     backLink: {
         display: 'flex',
